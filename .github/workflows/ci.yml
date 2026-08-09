@@ -22,7 +22,7 @@ jobs:
       - name: Run tests
         run: pytest -v
 
- build-and-push:              # job №2 — собрать образ и (только с main) залить его в GHCR
+build-and-push:              # job №2 — собрать образ и (только с main) залить его в GHCR
     runs-on: ubuntu-latest
     needs: test                # стартует только если тесты прошли
     steps:
