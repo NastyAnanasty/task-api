@@ -43,7 +43,7 @@ uvicorn app.main:app --reload
 
 ## Скриншот
 
-![Gradio-интерфейс](screenshots/Снимок экрана — 2026-08-11 в 23.51.20.png)
+![Gradio-интерфейс](screenshots/06_gradio_blocks_with_examples.png)
 
 ## Стек
 
