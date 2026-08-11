@@ -2,9 +2,9 @@
 
 Сервис на FastAPI + Gradio, который по 13 химическим показателям партии вина определяет сорт винограда (`class_0`, `class_1`, `class_2`). Принимает запросы как через REST (JSON), так и через браузерный Gradio-интерфейс.
 
-- **Live demo:** https://<ваш-поддомен>.nip.io/
-- **Swagger UI:** https://<ваш-поддомен>.nip.io/docs
-- **Health-check:** https://<ваш-поддомен>.nip.io/health
+- **Live demo:** https://194-58-95-208.nip.io/
+- **Swagger UI:** https://194-58-95-208.nip.io/docs
+- **Health-check:** https://194-58-95-208.nip.io/health
 
 ## Что внутри
 
