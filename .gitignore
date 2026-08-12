@@ -1,3 +1,5 @@
+qdrant_data/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -218,3 +220,5 @@ __marimo__/
 .streamlit/secrets.toml
 .DS_Store
 */.DS_Store
+
+data/corpus_chunks.jsonl
