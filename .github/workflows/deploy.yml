@@ -23,8 +23,8 @@ jobs:
           python-version: "3.11"
       - run: pip install -r requirements.txt
       - run: |
-          until curl -s http://localhost:6333/collections > dev/null; do
-            sleep 2
+          until curl -s http://localhost:6333/collections > /dev/null; do
+            sleep 10
           done
         
       - run: pytest tests/ -v
