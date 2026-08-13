@@ -22,6 +22,11 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt
+      - run: |
+          until curl -s http://localhost:6333/collections > dev/null; do
+            sleep 2
+          done
+        
       - run: pytest tests/ -v
         env:
           # Только секрет. Остальное (base URL, model, top_k, эмбеддер) —
