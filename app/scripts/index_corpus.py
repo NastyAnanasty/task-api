@@ -1,10 +1,3 @@
-"""Индексация чанков из `data/corpus_chunks.jsonl` в Qdrant.
-
-Пересоздаём коллекцию (учебный сценарий — чистый старт каждый раз),
-считаем эмбеддинги через `multilingual-e5-small` и сразу проверяем,
-что retriever ходит: три sanity-запроса (EN / RU / meta-вопрос).
-Все параметры — из `app.config.settings`, никаких магических констант.
-"""
 import json
 from pathlib import Path
 
@@ -19,8 +12,7 @@ from app.config import settings
 CHUNKS_PATH = Path("data/corpus_chunks.jsonl")
 
 
-def load_chunks(path: Path) -> list[Document]:
-    """Прочитать jsonl и собрать список Document'ов с метаданными."""
+def load_chunks(path: Path) -> list:
     docs = []
     with path.open(encoding="utf-8") as fh:
         for line in fh:
@@ -31,11 +23,8 @@ def load_chunks(path: Path) -> list[Document]:
 
 
 def main() -> None:
-    """Пересоздать коллекцию Qdrant, проиндексировать чанки, прогнать sanity-чек."""
     client = QdrantClient(url=settings.qdrant_url)
 
-    # Пересоздаём коллекцию: чистый старт упрощает отладку.
-    # В проде вместо recreate_collection обычно делают upsert по batch.
     if client.collection_exists(settings.collection_name):
         client.delete_collection(settings.collection_name)
     client.create_collection(
@@ -58,7 +47,6 @@ def main() -> None:
     vectorstore.add_documents(chunks)
     print(f"Indexed {len(chunks)} chunks")
 
-    # Sanity: один запрос на английском, один на русском, один meta-вопрос.
     for query in [
         "How does Ridge regression work?",
         "Что такое переобучение?",
@@ -73,4 +61,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

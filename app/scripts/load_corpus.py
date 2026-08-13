@@ -1,10 +1,3 @@
-"""Загрузка корпуса: документация scikit-learn + локальные .md-файлы.
-
-Делает четыре вещи подряд: тянет HTML-страницы по списку URL, читает
-локальные `*.md` из `data/local/`, чистит HTML от script/nav/footer и
-режет результат на чанки фиксированного размера. Финальный результат
-— `data/corpus_chunks.jsonl`, который дальше едет в `index_corpus.py`.
-"""
 import json
 from pathlib import Path
 
@@ -13,8 +6,6 @@ from langchain_community.document_loaders import RecursiveUrlLoader
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# Три самых «спрашиваемых» раздела Classic ML.
-# Расширение списка — опциональное домашнее задание в конце недели.
 SEED_URLS = [
     "https://scikit-learn.org/stable/modules/linear_model.html",
     "https://scikit-learn.org/stable/modules/tree.html",
@@ -28,7 +19,6 @@ CHUNK_OVERLAP = 200
 
 
 def clean_html(html: str) -> str:
-    """Выкинуть script/style/nav/header/footer и вернуть чистый текст страницы."""
     soup = BeautifulSoup(html, "lxml")
     for tag in soup(["script", "style", "nav", "footer", "header"]):
         tag.decompose()
@@ -36,7 +26,6 @@ def clean_html(html: str) -> str:
 
 
 def load_url_corpus() -> list[Document]:
-    """Скачать страницы документации scikit-learn по списку SEED_URLS."""
     all_docs: list[Document] = []
     for url in SEED_URLS:
         print(f"Loading {url} ...")
@@ -48,7 +37,6 @@ def load_url_corpus() -> list[Document]:
 
 
 def load_local_corpus() -> list[Document]:
-    """Подтянуть любые `*.md` из `data/local/` — внутренние документы сервиса."""
     if not LOCAL_DIR.exists():
         return []
     docs: list[Document] = []
@@ -68,7 +56,6 @@ def load_local_corpus() -> list[Document]:
 
 
 def chunk_documents(docs: list[Document]) -> list[Document]:
-    """Нарезать документы на куски CHUNK_SIZE символов с overlap'ом."""
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=CHUNK_SIZE,
         chunk_overlap=CHUNK_OVERLAP,
@@ -78,7 +65,6 @@ def chunk_documents(docs: list[Document]) -> list[Document]:
 
 
 def save_chunks(chunks: list[Document], path: Path) -> None:
-    """Сохранить чанки в jsonl: каждая строка — {"content": ..., "metadata": ...}."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as fh:
         for chunk in chunks:
@@ -88,7 +74,6 @@ def save_chunks(chunks: list[Document], path: Path) -> None:
 
 
 def main() -> None:
-    """Точка входа: грузим, режем, сохраняем."""
     url_docs = load_url_corpus()
     local_docs = load_local_corpus()
     chunks = chunk_documents(url_docs + local_docs)
