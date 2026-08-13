@@ -20,7 +20,7 @@ jobs:
           # Только секрет. Остальное (base URL, model, top_k, эмбеддер) —
           # дефолты из app/config.py, общие для CI / локали / прода.
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          QDRANT_URL: http://localhost:6333
+          QDRANT_URL: ${{ secrets.QDRANT_HOST }}
 
   deploy:
     needs: test
