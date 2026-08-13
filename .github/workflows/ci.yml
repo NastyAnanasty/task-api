@@ -20,7 +20,10 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run tests
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
         run: pytest -v
+        
 
   build-and-push:              # job №2 — собрать образ и (только с main) залить его в GHCR
     runs-on: ubuntu-latest
