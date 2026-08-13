@@ -1,24 +1,19 @@
-# Базовый образ: Python 3.11 в минимальной (slim) редакции
 FROM python:3.11-slim
 
-# Внутри контейнера работаем из /app — как `cd /app` в терминале
 WORKDIR /app
 
-# Сначала ставим зависимости — отдельным слоем, чтобы Docker кешировал
-# этот шаг и не переустанавливал библиотеки при каждом изменении кода
+# Системные зависимости для lxml и sentence-transformers
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем папку app/ внутрь контейнера в /app/app
 COPY app ./app
-COPY models/ ./models/
+COPY data ./data
 
-# Не буферизовать stdout — иначе логи могут "застрять" и не попасть в docker logs
 ENV PYTHONUNBUFFERED=1
-# Документируем, что контейнер слушает порт 8000 (метаданные для других инструментов)
-EXPOSE 8000
+ENV PYTHONDONTWRITEBYTECODE=1
 
-# Команда запуска контейнера. Формат списка (не строка) — чтобы Ctrl+C
-# корректно передавался процессу. --host 0.0.0.0 обязательно: иначе
-# снаружи коробки сервис будет недоступен.
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
