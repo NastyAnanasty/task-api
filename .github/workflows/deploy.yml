@@ -9,6 +9,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    services:
+      qdrant:
+        image: qdrant/qdrant:latest
+        ports:
+          - 6333:6333
+          - 6334:6334
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -20,7 +27,7 @@ jobs:
           # Только секрет. Остальное (base URL, model, top_k, эмбеддер) —
           # дефолты из app/config.py, общие для CI / локали / прода.
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          QDRANT_URL: ${{ secrets.QDRANT_HOST }}
+          QDRANT_URL: http://localhost:6333
 
   deploy:
     needs: test
