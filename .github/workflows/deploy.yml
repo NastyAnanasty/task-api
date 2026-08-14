@@ -26,7 +26,10 @@ jobs:
           until curl -s http://localhost:6333/collections > /dev/null; do
             sleep 10
           done
-        
+      - run: python -m app.scripts.load_corpus
+      - run: python -m app.scripts.index_corpus
+        env:
+            QDRANT_URL: http://localhost:6333
       - run: pytest tests/ -v
         env:
           # Только секрет. Остальное (base URL, model, top_k, эмбеддер) —
