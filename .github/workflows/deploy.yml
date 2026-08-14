@@ -29,6 +29,7 @@ jobs:
       - run: python -m app.scripts.load_corpus
       - run: python -m app.scripts.index_corpus
         env:
+            LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
             QDRANT_URL: http://localhost:6333
       - run: pytest tests/ -v
         env:
