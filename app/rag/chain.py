@@ -36,6 +36,7 @@ def get_vectorstore() -> QdrantVectorStore:
     print("=== BEFORE QDRANT VECTORSTORE ===")
     print("URL:", settings.qdrant_url)
     print("COLLECTION:", repr(settings.collection_name))
+    print(client.info())
     print(
         "COLLECTIONS:",
         [c.name for c in client.get_collections().collections]
