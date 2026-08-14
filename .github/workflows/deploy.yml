@@ -31,12 +31,26 @@ jobs:
         env:
             LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
             QDRANT_URL: http://localhost:6333
-      - run: |
-          echo "===Qdrant ==="
-          curl -s http://localhost:6333/collections
-          echo
-          curl -s http://localhost:6333/collections/sklearn_docs
-          echo
+      - name: Debug Qdrant connection
+        run: |
+          python - <<'PY'
+          from app.config import settings
+          from qdrant_client import QdrantClient
+      
+          print("QDRANT_URL env:", __import__("os").getenv("QDRANT_URL"))
+          print("settings.qdrant_url:", settings.qdrant_url)
+      
+          client = QdrantClient(url=settings.qdrant_url)
+      
+          print("collections:", [
+              c.name for c in client.get_collections().collections
+          ])
+      
+          print("sklearn_docs:", client.collection_exists("sklearn_docs"))
+          PY
+        env:
+          QDRANT_URL: http://localhost:6333
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
       - run: pytest tests/ -v
         env:
           # Только секрет. Остальное (base URL, model, top_k, эмбеддер) —
