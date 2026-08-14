@@ -1,10 +1,3 @@
-"""LCEL-цепочка RAG: retriever → prompt → LLM → parser.
-
-`build_rag_chain()` собирает цепочку из готовых блоков и возвращает её
-вместе с retriever'ом (он отдельно нужен для оценки в Шаге 8).
-`format_docs_with_sources()` склеивает топ-k чанков в нумерованный
-контекст, чтобы LLM могла цитировать источники как `[1]`, `[2]`.
-"""
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -38,12 +31,32 @@ Answer (with citations):"""
 
 
 def get_vectorstore() -> QdrantVectorStore:
-    """Поднять клиент Qdrant + эмбеддер и завернуть в LangChain-VectorStore."""
     client = QdrantClient(url=settings.qdrant_url)
+
+    print("=== BEFORE QDRANT VECTORSTORE ===")
+    print("URL:", settings.qdrant_url)
+    print("COLLECTION:", repr(settings.collection_name))
+    print(client.info())
+    print(
+        "COLLECTIONS:",
+        [c.name for c in client.get_collections().collections]
+    )
+
+    info = client.get_collection(settings.collection_name)
+
+    print("GET_COLLECTION OK")
+    print("VECTOR SIZE:", info.config.params.vectors.size)
+    print("POINTS:", info.points_count)
+
     embeddings = HuggingFaceEmbeddings(
         model_name=settings.embedding_model,
-        encode_kwargs={"normalize_embeddings": settings.normalize_embeddings},
+        encode_kwargs={
+            "normalize_embeddings": settings.normalize_embeddings
+        },
     )
+
+    print("=== CREATING QDRANT VECTORSTORE ===")
+
     return QdrantVectorStore(
         client=client,
         collection_name=settings.collection_name,
@@ -52,7 +65,6 @@ def get_vectorstore() -> QdrantVectorStore:
 
 
 def format_docs_with_sources(docs: list[Document]) -> str:
-    """Склеить топ-k чанков в нумерованный context-блок для prompt'а LLM."""
     lines = []
     for i, doc in enumerate(docs, 1):
         source = doc.metadata.get("source", "unknown")
@@ -61,7 +73,6 @@ def format_docs_with_sources(docs: list[Document]) -> str:
 
 
 def build_rag_chain():
-    """Собрать LCEL-цепочку и вернуть пару (chain, retriever)."""
     vectorstore = get_vectorstore()
     retriever = vectorstore.as_retriever(search_kwargs={"k": settings.top_k})
     llm = get_llm()

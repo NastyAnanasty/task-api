@@ -8,10 +8,10 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # Только секрет — без default, контейнер падает если не задан.
+    # Secret — env only
     llm_api_key: str
 
-    # LLM provider. Дефолты для OpenRouter; override через .env при смене провайдера.
+    # LLM provider
     llm_base_url: str = "https://openrouter.ai/api/v1"
     llm_model: str = "meta-llama/llama-3.3-70b-instruct"
     llm_temperature: float = 0.0
@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     collection_name: str = "sklearn_docs"
     top_k: int = 4
 
-    # Embeddings (e5 — мультиязычный, нужно для русского)
+    # Embeddings
     embedding_model: str = "intfloat/multilingual-e5-small"
     embedding_dim: int = 384
     normalize_embeddings: bool = True

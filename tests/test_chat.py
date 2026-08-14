@@ -13,7 +13,6 @@ def test_health() -> None:
 
 
 def test_chat_validates_empty_question() -> None:
-    """Empty question must be rejected by Pydantic before reaching the chain."""
     with TestClient(app) as client:
         response = client.post("/chat", json={"question": ""})
     assert response.status_code == 422
@@ -21,7 +20,6 @@ def test_chat_validates_empty_question() -> None:
 
 @patch("app.main.build_rag_chain")
 def test_chat_returns_answer_with_sources(mock_build) -> None:
-    """Smoke test with fully mocked chain — no LLM call, no Qdrant call."""
     mock_chain = MagicMock()
     mock_chain.invoke.return_value = "Ridge uses L2 penalty [1]."
 
@@ -41,4 +39,3 @@ def test_chat_returns_answer_with_sources(mock_build) -> None:
     assert "Ridge uses L2" in body["answer"]
     assert len(body["sources"]) == 1
     assert "scikit-learn.org" in body["sources"][0]["url"]
-

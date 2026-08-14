@@ -10,9 +10,6 @@ from app.schemas.chat import ChatRequest, ChatResponse, Source
 _chain = None
 _retriever = None
 
-# LaTeX delimiters для Gradio Chatbot. LLM-ответы про Ridge, Lasso, метрики
-# содержат формулы $$..$$ / \[..\] / $..$ — без этого блока они отрисуются
-# как сырые строки `$\ell_1$`.
 LATEX_DELIMITERS = [
     {"left": "$$", "right": "$$", "display": True},
     {"left": "\\[", "right": "\\]", "display": True},
@@ -56,6 +53,7 @@ def chat(payload: ChatRequest) -> ChatResponse:
         Source(
             url=doc.metadata.get("source", "unknown"),
             snippet=doc.page_content[:200].strip(),
+            full_context=doc.page_content.strip(),
         )
         for doc in docs
     ]
@@ -102,7 +100,6 @@ def respond(message: str, history: list):
     retrieval_ms = (time.perf_counter() - t0) * 1000
     sources_panel = _format_sources(docs)
 
-    # Yield #1: sources уже на экране, LLM ещё не начал писать.
     history.append({"role": "assistant", "content": ""})
     yield (
         history, "",
@@ -125,9 +122,9 @@ def respond(message: str, history: list):
             history[-1]["content"] = accumulated
             yield (
                 history, "",
-                f"### ⏱ Тайминги\n\n"
+                "### ⏱ Тайминги\n\n"
                 f"- 🔍 **Retrieval:** {retrieval_ms:.0f} ms\n"
-                f"- ⚡ **TTFT (1st token):** {ttft_ms:.0f} ms\n"
+                f"- ⚡ **TTFT:** {ttft_ms:.0f} ms\n"
                 f"- 🤖 **LLM:** _streaming… {len(accumulated)} chars_",
                 sources_panel,
             )
@@ -154,10 +151,6 @@ def respond(message: str, history: list):
         )
 
 
-# CSS делает три вещи: 1) распахивает контейнер на всю ширину,
-# 2) фиксирует высоту чата и боковой панели на calc(100vh - 220px) —
-#    минус headers — чтобы при наборе сообщения чат НЕ сжимался,
-# 3) добавляет видимую границу между чатом и боковой панелью.
 CSS = """
 .gradio-container { max-width: 100% !important; padding: 1rem !important; }
 #chatbot { height: calc(100vh - 220px) !important; min-height: 500px !important; }
