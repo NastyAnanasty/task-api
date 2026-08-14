@@ -36,6 +36,10 @@ def get_vectorstore() -> QdrantVectorStore:
         model_name=settings.embedding_model,
         encode_kwargs={"normalize_embeddings": settings.normalize_embeddings},
     )
+  print("=== RAG QDRANT DEBUG ===")
+  print("settings.qdrant_url =", settings.qdrant_url)
+  print("settings.collection_name =", settings.collection_name)
+  print("client =", client)
     return QdrantVectorStore(
         client=client,
         collection_name=settings.collection_name,
