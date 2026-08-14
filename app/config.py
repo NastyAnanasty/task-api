@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     # LLM provider
     llm_base_url: str = "https://openrouter.ai/api/v1"
-    llm_model: str = "meta-llama/llama-3.3-70b-instruct"
+    llm_model: str = "deepseek/deepseek-v4-pro-0813"
     llm_temperature: float = 0.0
 
     # Vector store
