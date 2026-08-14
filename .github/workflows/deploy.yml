@@ -31,6 +31,12 @@ jobs:
         env:
             LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
             QDRANT_URL: http://localhost:6333
+      - run: |
+          echo "===Qdrant ==="
+          curl -s http://localhost:6333/collections
+          echo
+          curl -s http://localhost:6333/collections/sklearn_docs
+          echo
       - run: pytest tests/ -v
         env:
           # Только секрет. Остальное (base URL, model, top_k, эмбеддер) —
