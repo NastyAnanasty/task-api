@@ -32,14 +32,30 @@ Answer (with citations):"""
 
 def get_vectorstore() -> QdrantVectorStore:
     client = QdrantClient(url=settings.qdrant_url)
+
+    print("=== BEFORE QDRANT VECTORSTORE ===")
+    print("URL:", settings.qdrant_url)
+    print("COLLECTION:", repr(settings.collection_name))
+    print(
+        "COLLECTIONS:",
+        [c.name for c in client.get_collections().collections]
+    )
+
+    info = client.get_collection(settings.collection_name)
+
+    print("GET_COLLECTION OK")
+    print("VECTOR SIZE:", info.config.params.vectors.size)
+    print("POINTS:", info.points_count)
+
     embeddings = HuggingFaceEmbeddings(
         model_name=settings.embedding_model,
-        encode_kwargs={"normalize_embeddings": settings.normalize_embeddings},
+        encode_kwargs={
+            "normalize_embeddings": settings.normalize_embeddings
+        },
     )
-  print("=== RAG QDRANT DEBUG ===")
-  print("settings.qdrant_url =", settings.qdrant_url)
-  print("settings.collection_name =", settings.collection_name)
-  print("client =", client)
+
+    print("=== CREATING QDRANT VECTORSTORE ===")
+
     return QdrantVectorStore(
         client=client,
         collection_name=settings.collection_name,
